@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Clock, Target } from 'lucide-react'
+import { Target } from 'lucide-react'
 import { HyroxEvent } from '../types/athlete'
 
 interface TimerDisplayProps {
@@ -29,10 +29,10 @@ export function TimerDisplay({
   }
 
   const getTimerClass = (): string => {
-    if (!isRunning) return 'text-hyrox-gray-medium dark:text-hyrox-gray-light'
-    if (timeRemaining <= 10 && timeRemaining > 0) return 'timer-warning'
-    if (timeRemaining <= 0) return 'timer-complete'
-    return 'timer-running text-hyrox-orange'
+    if (!isRunning) return 'text-gray-500'
+    if (timeRemaining <= 10 && timeRemaining > 0) return 'text-red-500'
+    if (timeRemaining <= 0) return 'text-green-500'
+    return 'text-yellow-400'
   }
 
   const getProgressPercentage = (): number => {
@@ -42,38 +42,36 @@ export function TimerDisplay({
   }
 
   return (
-    <div className="flex flex-col items-center space-y-6">
+    <div className="text-center">
       {currentEvent && (
         <motion.div
           key={eventIndex}
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center w-full"
+          className="mb-6"
         >
           {/* Event Header */}
-          <div className="flex items-center justify-center space-x-3 mb-4">
-            <div className="p-2 bg-hyrox-orange/10 rounded-lg">
-              <Target className="w-6 h-6 text-hyrox-orange" />
-            </div>
-            <div className="text-left">
-              <h2 className="text-2xl md:text-3xl font-black text-hyrox-black dark:text-white">
+          <div className="flex items-center justify-center mb-4">
+            <Target className="text-yellow-400 mr-3" size={28} />
+            <div>
+              <h2 className="text-3xl font-black text-white">
                 {currentEvent.name.toUpperCase()}
               </h2>
-              <p className="text-sm font-semibold text-hyrox-gray-medium dark:text-hyrox-gray-light">
+              <p className="text-gray-400 font-semibold">
                 Event {eventIndex + 1} of {totalEvents}
               </p>
             </div>
           </div>
 
           {/* Progress Bar */}
-          <div className="w-full max-w-md mx-auto mb-6">
-            <div className="flex justify-between text-xs font-bold text-hyrox-gray-medium dark:text-hyrox-gray-light mb-2">
+          <div className="max-w-md mx-auto mb-6">
+            <div className="flex justify-between text-xs font-bold text-gray-400 mb-2">
               <span>PROGRESS</span>
               <span>{Math.round(getProgressPercentage())}%</span>
             </div>
-            <div className="w-full bg-gray-200 dark:bg-hyrox-gray-dark rounded-full h-2 overflow-hidden">
+            <div className="w-full bg-gray-700 rounded-full h-3">
               <motion.div
-                className="hyrox-gradient h-2 rounded-full"
+                className="bg-yellow-400 h-3 rounded-full transition-all duration-300"
                 initial={{ width: 0 }}
                 animate={{ width: `${getProgressPercentage()}%` }}
                 transition={{ duration: 0.3 }}
@@ -84,9 +82,9 @@ export function TimerDisplay({
       )}
       
       {/* Main Timer */}
-      <div className="relative">
+      <div className="relative mb-8">
         <motion.div
-          className={`text-8xl md:text-9xl font-black font-mono ${getTimerClass()}`}
+          className={`text-8xl font-black font-mono transition-colors duration-300 ${getTimerClass()}`}
           animate={timeRemaining <= 0 ? { scale: [1, 1.05, 1] } : {}}
           transition={{ duration: 0.3, repeat: timeRemaining <= 0 ? 3 : 0 }}
         >
@@ -106,7 +104,7 @@ export function TimerDisplay({
             <div className="w-4 h-4 bg-yellow-500 rounded-full" />
           )}
           {!isRunning && !isPaused && (
-            <div className="w-4 h-4 bg-gray-400 rounded-full" />
+            <div className="w-4 h-4 bg-gray-500 rounded-full" />
           )}
         </div>
       </div>
@@ -116,9 +114,8 @@ export function TimerDisplay({
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="flex items-center space-x-2 bg-yellow-500/10 border border-yellow-500/20 text-yellow-600 dark:text-yellow-400 px-4 py-2 rounded-lg font-bold"
+          className="inline-flex items-center space-x-2 bg-yellow-500 bg-opacity-20 border border-yellow-500 border-opacity-30 text-yellow-400 px-4 py-2 rounded-lg font-bold mb-4"
         >
-          <Clock className="w-4 h-4" />
           <span>PAUSED</span>
         </motion.div>
       )}
@@ -127,9 +124,8 @@ export function TimerDisplay({
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="flex items-center space-x-2 bg-green-500/10 border border-green-500/20 text-green-600 dark:text-green-400 px-4 py-2 rounded-lg font-bold"
+          className="inline-flex items-center space-x-2 bg-green-500 bg-opacity-20 border border-green-500 border-opacity-30 text-green-400 px-4 py-2 rounded-lg font-bold mb-4"
         >
-          <Target className="w-4 h-4" />
           <span>EVENT COMPLETE!</span>
         </motion.div>
       )}
