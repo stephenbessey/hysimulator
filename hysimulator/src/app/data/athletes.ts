@@ -51,7 +51,7 @@ export const PRO_ATHLETES: Athlete[] = [
     totalTime: 3840, // 64:00
     events: [
       { name: '1km Run', duration: 210, color: '#ef4444' },
-      { name: '1000m SkiErgolor: '#f97316' },
+      { name: '1000m SkiEerg', duration: 195, color: '#f97316' },
       { name: '1km Run', duration: 215, color: '#ef4444' },
       { name: '50m Sled Push', duration: 95, color: '#eab308' },
       { name: '1km Run', duration: 220, color: '#ef4444' },
