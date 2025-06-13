@@ -36,15 +36,15 @@ export function AthleteSelector({
   return (
     <div className="space-y-4">
       <div className="flex items-center mb-4">
-        <Users className="text-yellow-400 mr-3" size={24} />
-        <h3 className="text-xl font-bold text-white">SELECT YOUR ATHLETE</h3>
+        <Users className="text-[#feed00] mr-3" size={24} />
+        <h3 className="text-xl font-bold text-black dark:text-white">SELECT YOUR ATHLETE</h3>
       </div>
       
       <select
         value={selectedAthlete?.id || ''}
         onChange={handleChange}
         disabled={disabled}
-        className="w-full p-3 bg-black border border-gray-700 rounded text-white font-semibold focus:border-yellow-400 focus:outline-none disabled:opacity-50"
+        className="w-full p-3 bg-white dark:bg-black border border-gray-300 dark:border-gray-700 rounded text-black dark:text-white font-semibold focus:border-[#feed00] focus:outline-none disabled:opacity-50"
       >
         <option value="">Choose an athlete...</option>
         <optgroup label="🥇 MEN'S DIVISION">
@@ -67,22 +67,22 @@ export function AthleteSelector({
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-4 bg-yellow-400 bg-opacity-10 border border-yellow-400 border-opacity-30 rounded"
+          className="p-4 bg-[#feed00]/10 border border-[#feed00]/30 rounded"
         >
           <div className="flex justify-between items-center">
             <div>
-              <h4 className="font-black text-white text-lg">
+              <h4 className="font-black text-black dark:text-white text-lg">
                 {selectedAthlete.name.toUpperCase()}
               </h4>
-              <p className="text-gray-400">
+              <p className="text-gray-600 dark:text-gray-400">
                 {selectedAthlete.category === 'men' ? 'Men\'s' : 'Women\'s'} Division
               </p>
             </div>
             <div className="text-right">
-              <div className="text-2xl font-black text-yellow-400">
+              <div className="text-2xl font-black text-[#feed00]">
                 {formatTime(selectedAthlete.totalTime)}
               </div>
-              <div className="text-xs text-gray-400 font-semibold">
+              <div className="text-xs text-gray-600 dark:text-gray-400 font-semibold">
                 TOTAL TIME
               </div>
             </div>

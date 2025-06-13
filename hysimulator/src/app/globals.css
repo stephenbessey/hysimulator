@@ -12,11 +12,10 @@
 
 body {
   font-family: 'Inter', system-ui, sans-serif;
-  @apply bg-white dark:bg-black text-black dark:text-white;
   line-height: 1.6;
 }
 
-/* Official HYROX Colors */
+/* Official HYROX Colors - now properly integrated with Tailwind dark mode */
 :root {
   --hyrox-yellow: #feed00;
   --hyrox-black: #000000;
@@ -26,46 +25,7 @@ body {
   --hyrox-gray-700: #374151;
 }
 
-/* Custom utility classes with correct HYROX yellow */
-@layer utilities {
-  .text-hyrox-yellow {
-    color: #feed00;
-  }
-  
-  .bg-hyrox-yellow {
-    background-color: #feed00;
-  }
-  
-  .border-hyrox-yellow {
-    border-color: #feed00;
-  }
-  
-  .bg-hyrox-black {
-    background-color: #000000;
-  }
-  
-  /* Update card colors for light/dark modes */
-  .bg-card-dark {
-    @apply bg-gray-100 dark:bg-[#111827];
-  }
-  
-  .border-card-dark {
-    @apply border-gray-300 dark:border-[#374151];
-  }
-
-  /* Yellow with opacity variations */
-  .bg-hyrox-yellow-10 {
-    background-color: rgba(254, 237, 0, 0.1);
-  }
-  
-  .bg-hyrox-yellow-20 {
-    background-color: rgba(254, 237, 0, 0.2);
-  }
-  
-  .border-hyrox-yellow-30 {
-    border-color: rgba(254, 237, 0, 0.3);
-  }
-}
+/* Remove the manual dark mode styles - let Tailwind handle this */
 
 /* Timer animations with correct yellow */
 .timer-running {
@@ -99,7 +59,7 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-200 dark:bg-[#1f2937];
+  @apply bg-gray-200 dark:bg-gray-800;
 }
 
 ::-webkit-scrollbar-thumb {

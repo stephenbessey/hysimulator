@@ -23,13 +23,13 @@ export function TimerControls({
 }: TimerControlsProps) {
   return (
     <div className="text-center">
-      <h3 className="text-lg font-black text-white mb-4">TIMER CONTROLS</h3>
+      <h3 className="text-lg font-black text-black dark:text-white mb-4">TIMER CONTROLS</h3>
       <div className="flex justify-center space-x-4 flex-wrap">
         {!isRunning || isPaused ? (
           <button
             onClick={onStart}
             disabled={disabled}
-            className="flex items-center space-x-2 bg-yellow-400 text-black px-6 py-3 rounded font-bold hover:bg-yellow-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center space-x-2 bg-[#feed00] text-black px-6 py-3 rounded font-bold hover:bg-[#feed00]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Play size={20} />
             <span>{!isRunning ? 'START' : 'RESUME'}</span>

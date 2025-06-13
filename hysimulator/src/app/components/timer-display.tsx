@@ -32,7 +32,7 @@ export function TimerDisplay({
     if (!isRunning) return 'text-gray-500'
     if (timeRemaining <= 10 && timeRemaining > 0) return 'text-red-500'
     if (timeRemaining <= 0) return 'text-green-500'
-    return 'text-yellow-400'
+    return 'text-[#feed00]'
   }
 
   const getProgressPercentage = (): number => {
@@ -52,12 +52,12 @@ export function TimerDisplay({
         >
           {/* Event Header */}
           <div className="flex items-center justify-center mb-4">
-            <Target className="text-yellow-400 mr-3" size={28} />
+            <Target className="text-[#feed00] mr-3" size={28} />
             <div>
-              <h2 className="text-3xl font-black text-white">
+              <h2 className="text-3xl font-black text-black dark:text-white">
                 {currentEvent.name.toUpperCase()}
               </h2>
-              <p className="text-gray-400 font-semibold">
+              <p className="text-gray-600 dark:text-gray-400 font-semibold">
                 Event {eventIndex + 1} of {totalEvents}
               </p>
             </div>
@@ -65,13 +65,13 @@ export function TimerDisplay({
 
           {/* Progress Bar */}
           <div className="max-w-md mx-auto mb-6">
-            <div className="flex justify-between text-xs font-bold text-gray-400 mb-2">
+            <div className="flex justify-between text-xs font-bold text-gray-600 dark:text-gray-400 mb-2">
               <span>PROGRESS</span>
               <span>{Math.round(getProgressPercentage())}%</span>
             </div>
-            <div className="w-full bg-gray-700 rounded-full h-3">
+            <div className="w-full bg-gray-300 dark:bg-gray-700 rounded-full h-3">
               <motion.div
-                className="bg-yellow-400 h-3 rounded-full transition-all duration-300"
+                className="bg-[#feed00] h-3 rounded-full transition-all duration-300"
                 initial={{ width: 0 }}
                 animate={{ width: `${getProgressPercentage()}%` }}
                 transition={{ duration: 0.3 }}
@@ -114,7 +114,7 @@ export function TimerDisplay({
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="inline-flex items-center space-x-2 bg-yellow-500 bg-opacity-20 border border-yellow-500 border-opacity-30 text-yellow-400 px-4 py-2 rounded-lg font-bold mb-4"
+          className="inline-flex items-center space-x-2 bg-yellow-500/20 border border-yellow-500/30 text-yellow-400 px-4 py-2 rounded-lg font-bold mb-4"
         >
           <span>PAUSED</span>
         </motion.div>
@@ -124,7 +124,7 @@ export function TimerDisplay({
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="inline-flex items-center space-x-2 bg-green-500 bg-opacity-20 border border-green-500 border-opacity-30 text-green-400 px-4 py-2 rounded-lg font-bold mb-4"
+          className="inline-flex items-center space-x-2 bg-green-500/20 border border-green-500/30 text-green-400 px-4 py-2 rounded-lg font-bold mb-4"
         >
           <span>EVENT COMPLETE!</span>
         </motion.div>

@@ -22,19 +22,16 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white">
       {/* Header */}
-      <header className="border-b border-gray-800">
+      <header className="border-b border-gray-200 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-8">
-              <h1 className="text-4xl font-black tracking-wider text-white">
+              <h1 className="text-4xl font-black tracking-wider text-black dark:text-white">
                 HYROX
               </h1>
-              <span className="font-bold text-sm px-3 py-1 rounded" style={{
-                color: '#feed00',
-                backgroundColor: 'rgba(254, 237, 0, 0.2)'
-              }}>
+              <span className="font-bold text-sm px-3 py-1 rounded text-black bg-[#feed00]">
                 SIMULATOR
               </span>
             </div>
@@ -46,8 +43,7 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Yellow Hero Section */}
         <motion.div
-          className="text-black p-8 rounded-lg mb-8"
-          style={{ backgroundColor: '#feed00' }}
+          className="text-black p-8 rounded-lg mb-8 bg-[#feed00]"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
         >
@@ -61,7 +57,7 @@ export default function Home() {
 
         {/* Athlete Selection */}
         <motion.div
-          className="bg-gray-900 rounded-lg p-6 mb-8 border border-gray-800"
+          className="bg-gray-100 dark:bg-gray-900 rounded-lg p-6 mb-8 border border-gray-200 dark:border-gray-800"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
@@ -77,7 +73,7 @@ export default function Home() {
         {/* Timer Section */}
         {selectedAthlete && (
           <motion.div
-            className="bg-gray-900 rounded-lg p-8 mb-8 border border-gray-800"
+            className="bg-gray-100 dark:bg-gray-900 rounded-lg p-8 mb-8 border border-gray-200 dark:border-gray-800"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
@@ -96,7 +92,7 @@ export default function Home() {
         {/* Controls */}
         {selectedAthlete && (
           <motion.div
-            className="bg-gray-900 rounded-lg p-6 mb-8 border border-gray-800"
+            className="bg-gray-100 dark:bg-gray-900 rounded-lg p-6 mb-8 border border-gray-200 dark:border-gray-800"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
@@ -116,24 +112,21 @@ export default function Home() {
         {/* Progress Section */}
         {selectedAthlete && (
           <motion.div
-            className="bg-gray-900 rounded-lg p-6 mb-8 border border-gray-800"
+            className="bg-gray-100 dark:bg-gray-900 rounded-lg p-6 mb-8 border border-gray-200 dark:border-gray-800"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
           >
             <div className="mb-6">
-              <div className="flex justify-between items-center text-sm font-bold text-gray-400 mb-3">
+              <div className="flex justify-between items-center text-sm font-bold text-gray-600 dark:text-gray-400 mb-3">
                 <span>RACE PROGRESS</span>
-                <span className="text-black px-3 py-1 rounded-full text-xs font-black" style={{
-                  backgroundColor: '#feed00'
-                }}>
+                <span className="text-black px-3 py-1 rounded-full text-xs font-black bg-[#feed00]">
                   {timerState.currentEventIndex + 1} / {selectedAthlete.events.length}
                 </span>
               </div>
-              <div className="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
+              <div className="w-full bg-gray-300 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
                 <motion.div
-                  className="h-3 rounded-full"
-                  style={{ backgroundColor: '#feed00' }}
+                  className="h-3 rounded-full bg-[#feed00]"
                   initial={{ width: 0 }}
                   animate={{
                     width: `${((timerState.currentEventIndex + 1) / selectedAthlete.events.length) * 100}%`,
@@ -150,12 +143,11 @@ export default function Home() {
                   key={index}
                   className={`p-3 rounded text-xs font-bold transition-all duration-300 ${
                     index === timerState.currentEventIndex
-                      ? 'text-black transform scale-105'
+                      ? 'text-black bg-[#feed00] transform scale-105'
                       : index < timerState.currentEventIndex
                       ? 'bg-green-600 text-white'
-                      : 'bg-gray-700 text-gray-400'
+                      : 'bg-gray-300 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
                   }`}
-                  style={index === timerState.currentEventIndex ? { backgroundColor: '#feed00' } : {}}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: index * 0.05 }}
@@ -190,72 +182,59 @@ export default function Home() {
             transition={{ delay: 0.2 }}
           >
             <div className="max-w-4xl mx-auto">
-              <h2 className="text-5xl font-black text-white mb-6">
-                HYROX IS <span style={{ color: '#feed00' }}>FITNESS RACING</span>
+              <h2 className="text-5xl font-black text-black dark:text-white mb-6">
+                HYROX IS <span className="text-[#feed00]">FITNESS RACING</span>
               </h2>
-              <p className="text-xl text-gray-400 font-medium mb-12 leading-relaxed">
+              <p className="text-xl text-gray-600 dark:text-gray-400 font-medium mb-12 leading-relaxed">
                 HYROX combines both running & functional workout stations, where participants run 1km, 
                 followed by 1 functional workout station, repeated eight times.
               </p>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <motion.div
-                  className="bg-gray-900 p-8 rounded-lg border border-gray-800 transition-colors"
-                  style={{ 
-                    '&:hover': { borderColor: '#feed00' }
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.borderColor = '#feed00'}
-                  onMouseLeave={(e) => e.currentTarget.style.borderColor = '#374151'}
+                  className="bg-gray-100 dark:bg-gray-900 p-8 rounded-lg border border-gray-200 dark:border-gray-800 hover:border-[#feed00] transition-colors"
                   whileHover={{ scale: 1.02, y: -2 }}
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 >
                   <div className="text-4xl mb-4">🏃‍♂️</div>
-                  <h3 className="font-black text-xl mb-3 text-white">PRO ATHLETE TIMES</h3>
-                  <p className="text-gray-400 font-medium">
+                  <h3 className="font-black text-xl mb-3 text-black dark:text-white">PRO ATHLETE TIMES</h3>
+                  <p className="text-gray-600 dark:text-gray-400 font-medium">
                     Train with exact timing from world-championship level HYROX competitors
                   </p>
                 </motion.div>
                 
                 <motion.div
-                  className="bg-gray-900 p-8 rounded-lg border border-gray-800 transition-colors"
-                  onMouseEnter={(e) => e.currentTarget.style.borderColor = '#feed00'}
-                  onMouseLeave={(e) => e.currentTarget.style.borderColor = '#374151'}
+                  className="bg-gray-100 dark:bg-gray-900 p-8 rounded-lg border border-gray-200 dark:border-gray-800 hover:border-[#feed00] transition-colors"
                   whileHover={{ scale: 1.02, y: -2 }}
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 >
                   <div className="text-4xl mb-4">⏱️</div>
-                  <h3 className="font-black text-xl mb-3 text-white">AUDIO ALERTS</h3>
-                  <p className="text-gray-400 font-medium">
+                  <h3 className="font-black text-xl mb-3 text-black dark:text-white">AUDIO ALERTS</h3>
+                  <p className="text-gray-600 dark:text-gray-400 font-medium">
                     Get notified with sound alerts when it's time to transition to the next event
                   </p>
                 </motion.div>
                 
                 <motion.div
-                  className="bg-gray-900 p-8 rounded-lg border border-gray-800 transition-colors"
-                  onMouseEnter={(e) => e.currentTarget.style.borderColor = '#feed00'}
-                  onMouseLeave={(e) => e.currentTarget.style.borderColor = '#374151'}
+                  className="bg-gray-100 dark:bg-gray-900 p-8 rounded-lg border border-gray-200 dark:border-gray-800 hover:border-[#feed00] transition-colors"
                   whileHover={{ scale: 1.02, y: -2 }}
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 >
                   <div className="text-4xl mb-4">📱</div>
-                  <h3 className="font-black text-xl mb-3 text-white">MOBILE OPTIMIZED</h3>
-                  <p className="text-gray-400 font-medium">
+                  <h3 className="font-black text-xl mb-3 text-black dark:text-white">MOBILE OPTIMIZED</h3>
+                  <p className="text-gray-600 dark:text-gray-400 font-medium">
                     Perfect for use during your workouts - works flawlessly on all devices
                   </p>
                 </motion.div>
               </div>
 
               <motion.div
-                className="mt-12 p-6 rounded-lg border"
-                style={{ 
-                  backgroundColor: 'rgba(254, 237, 0, 0.1)',
-                  borderColor: 'rgba(254, 237, 0, 0.3)'
-                }}
+                className="mt-12 p-6 rounded-lg border border-[#feed00]/30 bg-[#feed00]/10"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
               >
-                <p className="font-bold text-lg" style={{ color: '#feed00' }}>
+                <p className="font-bold text-lg text-[#feed00]">
                   🔥 Ready to join the race? Select an athlete above and start your training!
                 </p>
               </motion.div>
