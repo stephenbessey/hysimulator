@@ -12,8 +12,7 @@
 
 body {
   font-family: 'Inter', system-ui, sans-serif;
-  background-color: #000000;
-  color: #ffffff;
+  @apply bg-white dark:bg-black text-black dark:text-white;
   line-height: 1.6;
 }
 
@@ -21,6 +20,7 @@ body {
 :root {
   --hyrox-yellow: #feed00;
   --hyrox-black: #000000;
+  --hyrox-white: #ffffff;
   --hyrox-gray-900: #111827;
   --hyrox-gray-800: #1f2937;
   --hyrox-gray-700: #374151;
@@ -44,12 +44,13 @@ body {
     background-color: #000000;
   }
   
+  /* Update card colors for light/dark modes */
   .bg-card-dark {
-    background-color: #111827;
+    @apply bg-gray-100 dark:bg-[#111827];
   }
   
   .border-card-dark {
-    border-color: #374151;
+    @apply border-gray-300 dark:border-[#374151];
   }
 
   /* Yellow with opacity variations */
@@ -98,7 +99,7 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #1f2937;
+  @apply bg-gray-200 dark:bg-[#1f2937];
 }
 
 ::-webkit-scrollbar-thumb {
