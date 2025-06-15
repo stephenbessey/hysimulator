@@ -1,24 +1,85 @@
+// src/app/page.tsx
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { AthleteSelector } from './components/athlete-selector'
 import { TimerDisplay } from './components/timer-display'
 import { TimerControls } from './components/timer-controls'
 import { ThemeToggle } from './components/theme-toggle'
 import { useTimer } from './hooks/use-timer'
-import { PRO_ATHLETES } from './data/athletes'
+import { fetchAthletes, checkBackendHealth } from './utils/api'
 import { Athlete } from './types/athlete'
+import { PRO_ATHLETES } from './data/athletes'
 
 export default function Home() {
   const [selectedAthlete, setSelectedAthlete] = useState<Athlete | null>(null)
+  const [athletes, setAthletes] = useState<Athlete[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [backendStatus, setBackendStatus] = useState<'loading' | 'online' | 'offline'>('loading')
+  
   const { timerState, currentEvent, start, pause, stop, reset } = useTimer(selectedAthlete)
 
+  useEffect(() => {
+    let isMounted = true
+
+    const loadAthletes = async () => {
+      setLoading(true)
+      setError(null)
+      
+      try {
+        const isHealthy = await checkBackendHealth()
+        setBackendStatus(isHealthy ? 'online' : 'offline')
+        
+        if (isHealthy) {
+          const fetchedAthletes = await fetchAthletes()
+          if (isMounted) {
+            setAthletes(fetchedAthletes)
+            console.log('✅ Successfully loaded athletes from backend:', fetchedAthletes.length)
+          }
+        } else {
+          throw new Error('Backend is not responding')
+        }
+      } catch (err) {
+        console.warn('⚠️ Backend unavailable, using fallback data:', err)
+        setBackendStatus('offline')
+        
+        if (isMounted) {
+          setAthletes(PRO_ATHLETES)
+          setError('Using offline data - backend connection failed')
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false)
+        }
+      }
+    }
+
+    loadAthletes()
+    
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
   const handleAthleteSelect = (athlete: Athlete | null) => {
-    if (timerState.isRunning) {
+    if (timerState?.isRunning) {
       stop()
     }
     setSelectedAthlete(athlete)
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#feed00] mx-auto mb-4"></div>
+          <h2 className="text-xl font-bold mb-2">Loading Athletes...</h2>
+          <p className="text-gray-600 dark:text-gray-400">Connecting to backend</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -34,6 +95,17 @@ export default function Home() {
               <span className="font-bold text-sm px-3 py-1 rounded text-black bg-[#feed00]">
                 SIMULATOR
               </span>
+              {/* Backend Status Indicator */}
+              <div className="flex items-center space-x-2">
+                <div className={`w-2 h-2 rounded-full ${
+                  backendStatus === 'online' ? 'bg-green-500' : 
+                  backendStatus === 'offline' ? 'bg-red-500' : 'bg-yellow-500'
+                }`}></div>
+                <span className="text-xs text-gray-600 dark:text-gray-400">
+                  {backendStatus === 'online' ? 'Live Data' : 
+                   backendStatus === 'offline' ? 'Offline Mode' : 'Connecting...'}
+                </span>
+              </div>
             </div>
             <ThemeToggle />
           </div>
@@ -41,6 +113,19 @@ export default function Home() {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Error Message */}
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 p-4 bg-yellow-100 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-700 rounded-lg"
+          >
+            <p className="text-yellow-800 dark:text-yellow-200 text-sm">
+              ⚠️ {error}
+            </p>
+          </motion.div>
+        )}
+
         {/* Yellow Hero Section */}
         <motion.div
           className="text-black p-8 rounded-lg mb-8 bg-[#feed00]"
@@ -49,198 +134,79 @@ export default function Home() {
         >
           <div className="text-center">
             <h2 className="text-4xl font-black mb-4">TRAIN LIKE A PRO</h2>
-            <p className="text-xl font-semibold">
-              Experience the exact timing of world-class HYROX athletes
+            <p className="text-lg font-semibold">
+              Follow the exact timing of world-class HYROX athletes
             </p>
+            <div className="mt-4 flex justify-center items-center space-x-4 text-sm">
+              <span>🏃‍♂️ {athletes.filter(a => a.category === 'men').length} Men's Athletes</span>
+              <span>🏃‍♀️ {athletes.filter(a => a.category === 'women').length} Women's Athletes</span>
+              <span>🎯 {athletes.length} Total Profiles</span>
+            </div>
           </div>
         </motion.div>
 
-        {/* Athlete Selection */}
-        <motion.div
-          className="bg-gray-100 dark:bg-gray-900 rounded-lg p-6 mb-8 border border-gray-200 dark:border-gray-800"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-        >
-          <AthleteSelector
-            athletes={PRO_ATHLETES}
-            selectedAthlete={selectedAthlete}
-            onAthleteSelect={handleAthleteSelect}
-            disabled={timerState.isRunning}
-          />
-        </motion.div>
-
-        {/* Timer Section */}
-        {selectedAthlete && (
-          <motion.div
-            className="bg-gray-100 dark:bg-gray-900 rounded-lg p-8 mb-8 border border-gray-200 dark:border-gray-800"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            <TimerDisplay
-              currentEvent={currentEvent}
-              timeRemaining={timerState.timeRemaining}
-              isRunning={timerState.isRunning}
-              isPaused={timerState.isPaused}
-              eventIndex={timerState.currentEventIndex}
-              totalEvents={selectedAthlete.events.length}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Column - Athlete Selection */}
+          <div className="lg:col-span-1">
+            <AthleteSelector
+              athletes={athletes}
+              selectedAthlete={selectedAthlete}
+              onAthleteSelect={handleAthleteSelect}
+              disabled={timerState?.isRunning || false}
             />
-          </motion.div>
-        )}
+          </div>
 
-        {/* Controls */}
-        {selectedAthlete && (
-          <motion.div
-            className="bg-gray-100 dark:bg-gray-900 rounded-lg p-6 mb-8 border border-gray-200 dark:border-gray-800"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <TimerControls
-              isRunning={timerState.isRunning}
-              isPaused={timerState.isPaused}
-              onStart={start}
-              onPause={pause}
-              onStop={stop}
-              onReset={reset}
-              disabled={!selectedAthlete}
-            />
-          </motion.div>
-        )}
-
-        {/* Progress Section */}
-        {selectedAthlete && (
-          <motion.div
-            className="bg-gray-100 dark:bg-gray-900 rounded-lg p-6 mb-8 border border-gray-200 dark:border-gray-800"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            <div className="mb-6">
-              <div className="flex justify-between items-center text-sm font-bold text-gray-600 dark:text-gray-400 mb-3">
-                <span>RACE PROGRESS</span>
-                <span className="text-black px-3 py-1 rounded-full text-xs font-black bg-[#feed00]">
-                  {timerState.currentEventIndex + 1} / {selectedAthlete.events.length}
-                </span>
-              </div>
-              <div className="w-full bg-gray-300 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
-                <motion.div
-                  className="h-3 rounded-full bg-[#feed00]"
-                  initial={{ width: 0 }}
-                  animate={{
-                    width: `${((timerState.currentEventIndex + 1) / selectedAthlete.events.length) * 100}%`,
-                  }}
-                  transition={{ duration: 0.8, ease: "easeOut" }}
+          {/* Right Column - Timer */}
+          <div className="lg:col-span-2">
+            {selectedAthlete ? (
+              <div className="space-y-6">
+                <TimerDisplay
+                  athlete={selectedAthlete}
+                  timerState={timerState}
+                  currentEvent={currentEvent}
+                />
+                <TimerControls
+                  timerState={timerState}
+                  onStart={start}
+                  onPause={pause}
+                  onStop={stop}
+                  onReset={reset}
+                  disabled={!selectedAthlete}
                 />
               </div>
-            </div>
-
-            {/* Event Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
-              {selectedAthlete.events.map((event, index) => (
-                <motion.div
-                  key={index}
-                  className={`p-3 rounded text-xs font-bold transition-all duration-300 ${
-                    index === timerState.currentEventIndex
-                      ? 'text-black bg-[#feed00] transform scale-105'
-                      : index < timerState.currentEventIndex
-                      ? 'bg-green-600 text-white'
-                      : 'bg-gray-300 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
-                  }`}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: index * 0.05 }}
-                  whileHover={{ scale: 1.05 }}
-                >
-                  <div className="flex items-center space-x-2 mb-2">
-                    <div
-                      className={`w-3 h-3 rounded-full border-2 ${
-                        index <= timerState.currentEventIndex ? 'bg-current' : 'border-current'
-                      }`}
-                    />
-                    <span className="text-xs font-black">#{index + 1}</span>
-                  </div>
-                  <div className="text-xs font-bold leading-tight mb-1">
-                    {event.name.toUpperCase()}
-                  </div>
-                  <div className="text-xs opacity-80 font-semibold">
-                    {Math.floor(event.duration / 60)}:{String(event.duration % 60).padStart(2, '0')}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
-        {/* Welcome Section */}
-        {!selectedAthlete && (
-          <motion.div
-            className="text-center py-16"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-5xl font-black text-black dark:text-white mb-6">
-                HYROX IS <span className="text-[#feed00]">FITNESS RACING</span>
-              </h2>
-              <p className="text-xl text-gray-600 dark:text-gray-400 font-medium mb-12 leading-relaxed">
-                HYROX combines both running & functional workout stations, where participants run 1km, 
-                followed by 1 functional workout station, repeated eight times.
-              </p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <motion.div
-                  className="bg-gray-100 dark:bg-gray-900 p-8 rounded-lg border border-gray-200 dark:border-gray-800 hover:border-[#feed00] transition-colors"
-                  whileHover={{ scale: 1.02, y: -2 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                >
-                  <div className="text-4xl mb-4">🏃‍♂️</div>
-                  <h3 className="font-black text-xl mb-3 text-black dark:text-white">PRO ATHLETE TIMES</h3>
-                  <p className="text-gray-600 dark:text-gray-400 font-medium">
-                    Train with exact timing from world-championship level HYROX competitors
-                  </p>
-                </motion.div>
-                
-                <motion.div
-                  className="bg-gray-100 dark:bg-gray-900 p-8 rounded-lg border border-gray-200 dark:border-gray-800 hover:border-[#feed00] transition-colors"
-                  whileHover={{ scale: 1.02, y: -2 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                >
-                  <div className="text-4xl mb-4">⏱️</div>
-                  <h3 className="font-black text-xl mb-3 text-black dark:text-white">AUDIO ALERTS</h3>
-                  <p className="text-gray-600 dark:text-gray-400 font-medium">
-                    Get notified with sound alerts when it's time to transition to the next event
-                  </p>
-                </motion.div>
-                
-                <motion.div
-                  className="bg-gray-100 dark:bg-gray-900 p-8 rounded-lg border border-gray-200 dark:border-gray-800 hover:border-[#feed00] transition-colors"
-                  whileHover={{ scale: 1.02, y: -2 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                >
-                  <div className="text-4xl mb-4">📱</div>
-                  <h3 className="font-black text-xl mb-3 text-black dark:text-white">MOBILE OPTIMIZED</h3>
-                  <p className="text-gray-600 dark:text-gray-400 font-medium">
-                    Perfect for use during your workouts - works flawlessly on all devices
-                  </p>
-                </motion.div>
-              </div>
-
+            ) : (
               <motion.div
-                className="mt-12 p-6 rounded-lg border border-[#feed00]/30 bg-[#feed00]/10"
+                className="text-center p-12 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.6 }}
               >
-                <p className="font-bold text-lg text-[#feed00]">
-                  🔥 Ready to join the race? Select an athlete above and start your training!
+                <h3 className="text-2xl font-bold text-gray-500 dark:text-gray-400 mb-4">
+                  SELECT AN ATHLETE TO BEGIN
+                </h3>
+                <p className="text-gray-400 dark:text-gray-500">
+                  Choose a professional athlete from the sidebar to start your HYROX simulation
                 </p>
               </motion.div>
-            </div>
-          </motion.div>
-        )}
+            )}
+          </div>
+        </div>
+
+        {/* Footer with backend info */}
+        <footer className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800">
+          <div className="text-center text-sm text-gray-600 dark:text-gray-400">
+            <p>
+              {backendStatus === 'online' ? 
+                '🚀 Connected to live backend API' : 
+                '📱 Running in offline mode with cached data'
+              }
+            </p>
+            {athletes.length > 0 && (
+              <p className="mt-1">
+                Serving {athletes.length} professional athlete profiles
+              </p>
+            )}
+          </div>
+        </footer>
       </div>
     </div>
   )
