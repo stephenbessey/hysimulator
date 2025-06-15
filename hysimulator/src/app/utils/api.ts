@@ -1,8 +1,7 @@
 import { Athlete } from '../types/athlete'
 
-const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://hysimulator-backend.onrender.com'
-  : 'https://hysimulator-backend.onrender.com'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://hysimulator-backend.onrender.com'
+
 
 function transformAthleteData(backendAthlete: any): Athlete {
   return {
@@ -27,7 +26,7 @@ export async function fetchAthletes(): Promise<Athlete[]> {
       headers: {
         'Content-Type': 'application/json',
       },
-      cache: 'force-cache'
+      cache: 'no-store'
     })
 
     if (!response.ok) {
