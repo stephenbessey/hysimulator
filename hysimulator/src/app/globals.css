@@ -15,7 +15,6 @@ body {
   line-height: 1.6;
 }
 
-/* Official HYROX Colors - now properly integrated with Tailwind dark mode */
 :root {
   --hyrox-yellow: #feed00;
   --hyrox-black: #000000;
@@ -25,9 +24,6 @@ body {
   --hyrox-gray-700: #374151;
 }
 
-/* Remove the manual dark mode styles - let Tailwind handle this */
-
-/* Timer animations with correct yellow */
 .timer-running {
   animation: glow 2s ease-in-out infinite alternate;
 }
@@ -53,7 +49,6 @@ body {
   }
 }
 
-/* Custom scrollbar with correct yellow */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -71,14 +66,12 @@ body {
   background: rgba(254, 237, 0, 0.8);
 }
 
-/* Focus states with correct yellow */
 select:focus,
 button:focus {
   outline: 2px solid #feed00;
   outline-offset: 2px;
 }
 
-/* Button hover effects */
 .btn-primary {
   background: #feed00;
   color: #000000;
@@ -90,9 +83,135 @@ button:focus {
   transform: translateY(-2px);
 }
 
-/* Card hover effects */
 .card-hover:hover {
   border-color: #feed00;
   transform: translateY(-2px);
   transition: all 0.3s ease;
+}
+
+input, select, textarea {
+  font-size: 16px;
+}
+
+button, .timer-control-button {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+@media (max-width: 768px) {
+  .timer-display-mobile {
+    font-size: 4rem !important;
+  }
+  
+  .mobile-padding {
+    padding: 1rem;
+  }
+
+  .timer-control-button {
+    width: 100%;
+    max-width: 280px;
+  }
+}
+
+@media (min-width: 1024px) {
+
+  .desktop-layout {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 2rem;
+    min-height: calc(100vh - 120px);
+  }
+  
+  .timer-display-large {
+    font-size: 8rem;
+    line-height: 1;
+  }
+
+  .timer-controls-large {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .athlete-sidebar-large {
+    position: sticky;
+    top: 2rem;
+    height: fit-content;
+    max-height: calc(100vh - 4rem);
+    overflow-y: auto;
+  }
+}
+
+@media (min-width: 1280px) {
+  .timer-display-xl {
+    font-size: 10rem;
+  }
+
+  .events-grid-xl {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .progress-section-xl {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 2rem;
+    align-items: center;
+  }
+}
+
+@media (min-width: 1536px) {
+  .container-2xl {
+    max-width: 1536px;
+    margin: 0 auto;
+  }
+  
+  .ultra-wide-layout {
+    display: grid;
+    grid-template-columns: 300px 1fr 300px;
+    gap: 2rem;
+  }
+
+  .stats-panel-xl {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 1rem;
+    padding: 2rem;
+    border: 1px solid rgba(254, 237, 0, 0.2);
+  }
+}
+
+.timer-control-button:active {
+  transform: scale(0.95);
+  transition: transform 0.1s ease;
+}
+
+.timer-control-button:focus-visible {
+  outline: 3px solid #feed00;
+  outline-offset: 2px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .timer-display {
+    text-shadow: 0 0 10px rgba(254, 237, 0, 0.3);
+  }
+}
+
+@media (min-width: 1024px) {
+  .timer-display, .progress-bar, .timer-control-button {
+    will-change: transform;
+    transform: translateZ(0);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  .timer-control-button:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
 }
