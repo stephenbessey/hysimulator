@@ -1,16 +1,8 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next",
   "framework": "nextjs",
-  "rewrites": [
-    {
-      "source": "/((?!api|_next|favicon\\.ico).*)",
-      "destination": "/"
-    }
-  ],
   "headers": [
     {
-      "source": "/favicon.ico",
+      "source": "/icon.ico",
       "headers": [
         {
           "key": "Cache-Control",
