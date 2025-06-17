@@ -3,7 +3,7 @@ import { Athlete } from '../types/athlete'
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://hysimulator-backend.onrender.com'
 
 function transformAthleteData(backendAthlete: any): Athlete {
-  let category = 'men'
+  let category: 'men' | 'women' = 'men'
   if (backendAthlete.category) {
     const categoryLower = backendAthlete.category.toLowerCase()
     if (categoryLower.includes('women') || categoryLower.includes('female')) {
