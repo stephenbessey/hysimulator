@@ -6,12 +6,12 @@ import { ThemeProvider } from './providers/theme-provider'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Hyrox Simulator',
+  title: 'Hy Simulator',
   description: 'Train with professional Hyrox athlete times',
   icons: {
-    icon: '/favicon.ico',
-    shortcut: '/favicon.ico',
-    apple: '/favicon.ico',
+    icon: `/favicon.ico?v=${Date.now()}`,
+    shortcut: `/favicon.ico?v=${Date.now()}`,
+    apple: `/favicon.ico?v=${Date.now()}`,
   },
 }
 
