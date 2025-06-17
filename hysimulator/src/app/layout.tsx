@@ -9,9 +9,14 @@ export const metadata: Metadata = {
   title: 'Hy Simulator',
   description: 'Train with professional Hyrox athlete times',
   icons: {
-    icon: `/favicon.ico?v=${Date.now()}`,
-    shortcut: `/favicon.ico?v=${Date.now()}`,
-    apple: `/favicon.ico?v=${Date.now()}`,
+    icon: [
+      {
+        url: '/favicon.ico',
+        sizes: 'any',
+      },
+    ],
+    shortcut: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
   },
 }
 
@@ -23,7 +28,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
+        {/* Explicit favicon links for better browser support */}
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <meta name="msapplication-TileColor" content="#000000" />
+        <meta name="theme-color" content="#000000" />
       </head>
       <body className={inter.className}>
         <ThemeProvider>
