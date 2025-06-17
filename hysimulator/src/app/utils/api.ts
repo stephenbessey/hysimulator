@@ -2,17 +2,26 @@ import { Athlete } from '../types/athlete'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://hysimulator-backend.onrender.com'
 
-
 function transformAthleteData(backendAthlete: any): Athlete {
+  let category = 'men'
+  if (backendAthlete.category) {
+    const categoryLower = backendAthlete.category.toLowerCase()
+    if (categoryLower.includes('women') || categoryLower.includes('female')) {
+      category = 'women'
+    } else if (categoryLower.includes('men') || categoryLower.includes('male')) {
+      category = 'men'
+    }
+  }
+
   return {
     id: backendAthlete.id.toString(),
     name: backendAthlete.name,
-    category: backendAthlete.category,
+    category: category,
     totalTime: backendAthlete.total_time,
     events: backendAthlete.events.map((event: any) => ({
       name: event.name,
       duration: event.duration,
-      color: event.color
+      color: event.color || '#feed00'
     }))
   }
 }
