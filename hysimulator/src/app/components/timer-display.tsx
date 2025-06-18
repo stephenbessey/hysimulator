@@ -196,7 +196,7 @@ export function TimerDisplay({
               </div>
               <div className="text-center">
                 <div className="font-black text-xs mb-1">
-                  {event.name.split(' ')[0]}
+                  {event.name}
                 </div>
                 <div className="text-xs opacity-75">
                   {formatTime(event.duration)}

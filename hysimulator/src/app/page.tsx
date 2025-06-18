@@ -1,14 +1,13 @@
-// src/app/page.tsx
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { AthleteSelector } from './components/athlete-selector'
 import { TimerDisplay } from './components/timer-display'
 import { TimerControls } from './components/timer-controls'
 import { ThemeToggle } from './components/theme-toggle'
 import { useTimer } from './hooks/use-timer'
-import { fetchAthletes, checkBackendHealth } from './utils/api'
+import { fetchAthletes, checkBackendHealth, refreshAthleteData } from './utils/api'
 import { Athlete } from './types/athlete'
 import { PRO_ATHLETES } from './data/athletes'
 
@@ -18,50 +17,66 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [backendStatus, setBackendStatus] = useState<'loading' | 'online' | 'offline'>('loading')
+  const [lastUpdate, setLastUpdate] = useState<string>('')
   
   const { timerState, currentEvent, start, pause, stop, reset } = useTimer(selectedAthlete)
 
-  useEffect(() => {
-    let isMounted = true
-
-    const loadAthletes = async () => {
-      setLoading(true)
+  const refreshData = useCallback(async (showLoading = false) => {
+    try {
+      if (showLoading) setLoading(true)
       setError(null)
       
-      try {
-        const isHealthy = await checkBackendHealth()
-        setBackendStatus(isHealthy ? 'online' : 'offline')
-        
-        if (isHealthy) {
-          const fetchedAthletes = await fetchAthletes()
-          if (isMounted) {
-            setAthletes(fetchedAthletes)
-            console.log('✅ Successfully loaded athletes from backend:', fetchedAthletes.length)
-          }
-        } else {
-          throw new Error('Backend is not responding')
-        }
-      } catch (err) {
-        console.warn('⚠️ Backend unavailable, using fallback data:', err)
-        setBackendStatus('offline')
-        
-        if (isMounted) {
-          setAthletes(PRO_ATHLETES)
-          setError('Using offline data - backend connection failed')
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false)
-        }
+      const isHealthy = await checkBackendHealth()
+      setBackendStatus(isHealthy ? 'online' : 'offline')
+      
+      if (isHealthy) {
+        console.log('🔄 Refreshing athlete data from backend...')
+        const fetchedAthletes = await refreshAthleteData()
+        setAthletes(fetchedAthletes)
+        setLastUpdate(new Date().toLocaleTimeString())
+        console.log('✅ Data refreshed:', fetchedAthletes.length, 'athletes')
+      } else {
+        throw new Error('Backend is not responding')
       }
-    }
-
-    loadAthletes()
-    
-    return () => {
-      isMounted = false
+    } catch (err) {
+      console.warn('⚠️ Backend unavailable, using fallback data:', err)
+      setBackendStatus('offline')
+      setAthletes(PRO_ATHLETES)
+      setError('Using offline data - backend connection failed')
+    } finally {
+      if (showLoading) setLoading(false)
     }
   }, [])
+
+  useEffect(() => {
+    if (selectedAthlete && athletes.length > 0) {
+      const updatedAthlete = athletes.find(a => a.id === selectedAthlete.id)
+      if (updatedAthlete && JSON.stringify(updatedAthlete) !== JSON.stringify(selectedAthlete)) {
+        console.log('🔄 Updating selected athlete with fresh data')
+        setSelectedAthlete(updatedAthlete)
+      }
+    }
+  }, [athletes, selectedAthlete])
+
+  useEffect(() => {
+    refreshData(true)
+  }, [refreshData])
+
+  useEffect(() => {
+    if (backendStatus !== 'online') return
+
+    const interval = setInterval(() => {
+      console.log('🔄 Periodic data refresh...')
+      refreshData(false)
+    }, 30000)
+
+    return () => clearInterval(interval)
+  }, [backendStatus, refreshData])
+
+  const handleManualRefresh = async () => {
+    console.log('👆 Manual refresh triggered')
+    await refreshData(true)
+  }
 
   const handleAthleteSelect = (athlete: Athlete | null) => {
     if (timerState?.isRunning) {
@@ -105,7 +120,21 @@ export default function Home() {
                   {backendStatus === 'online' ? 'Live Data' : 
                    backendStatus === 'offline' ? 'Offline Mode' : 'Connecting...'}
                 </span>
+                {lastUpdate && (
+                  <span className="text-xs text-gray-500">
+                    • Updated {lastUpdate}
+                  </span>
+                )}
               </div>
+              {/* Manual Refresh Button */}
+              <button
+                onClick={handleManualRefresh}
+                disabled={loading}
+                className="text-xs px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50"
+                title="Refresh athlete data"
+              >
+                🔄 Refresh
+              </button>
             </div>
             <ThemeToggle />
           </div>
@@ -138,9 +167,12 @@ export default function Home() {
               Follow the exact timing of world-class HYROX athletes
             </p>
             <div className="mt-4 flex justify-center items-center space-x-4 text-sm">
-              <span>🏃‍♂️ {athletes.filter(a => a.category === 'men').length} Men's Athletes</span>
-              <span>🏃‍♀️ {athletes.filter(a => a.category === 'women').length} Women's Athletes</span>
+              <span>🏃‍♂️ {athletes.filter(a => a.category.toLowerCase().includes('men')).length} Men's Athletes</span>
+              <span>🏃‍♀️ {athletes.filter(a => a.category.toLowerCase().includes('women')).length} Women's Athletes</span>
               <span>🎯 {athletes.length} Total Profiles</span>
+              {backendStatus === 'online' && (
+                <span>🔴 Live Data Active</span>
+              )}
             </div>
           </div>
         </motion.div>
@@ -196,13 +228,14 @@ export default function Home() {
           <div className="text-center text-sm text-gray-600 dark:text-gray-400">
             <p>
               {backendStatus === 'online' ? 
-                '🚀 Connected to live backend API' : 
+                '🚀 Connected to live backend API with real-time athlete data' : 
                 '📱 Running in offline mode with cached data'
               }
             </p>
             {athletes.length > 0 && (
               <p className="mt-1">
                 Serving {athletes.length} professional athlete profiles
+                {lastUpdate && ` • Last updated: ${lastUpdate}`}
               </p>
             )}
           </div>
