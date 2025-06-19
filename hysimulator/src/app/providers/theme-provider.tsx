@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState } from 'react'
+import { UI_CONSTANTS } from '../constants'
 
 type Theme = 'dark' | 'light' | 'system'
 
@@ -25,7 +26,7 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState)
 export function ThemeProvider({
   children,
   defaultTheme = 'system',
-  storageKey = 'hyrox-theme',
+  storageKey = UI_CONSTANTS.THEME.STORAGE_KEY,
   ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(

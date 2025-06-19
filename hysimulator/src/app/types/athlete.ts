@@ -1,77 +1,34 @@
-export interface Event {
-  name: string
-  duration: number
-  color: string
+export interface HyroxEvent {
+  readonly name: string
+  readonly duration: number // in seconds
+  readonly color: string
 }
 
 export interface Athlete {
-  id: string
-  name: string
-  category: 'men' | 'women'
-  totalTime: number
-  events: Event[]
-  lastUpdated?: string
-  ranking?: number
-  year?: number
-  location?: string
+  readonly id: string
+  readonly name: string
+  readonly category: AthleteCategory
+  readonly totalTime: number
+  readonly events: readonly HyroxEvent[]
 }
 
-export interface AthleteStats {
-  totalAthletes: number
-  menCount: number
-  womenCount: number
-  averageTime: number
-  fastestTime: number
-  slowestTime: number
-  lastUpdate: string
-}
-
-export interface EventStats {
-  name: string
-  count: number
-  average: number
-  fastest: number
-  slowest: number
-}
-
-export interface LeaderboardEntry extends Athlete {
-  position: number
-}
-
-export interface WorkoutSession {
-  id: string
-  athleteId: string
-  userId: string
-  startTime: string
-  endTime?: string
-  currentEventIndex: number
-  timeRemaining: number
-  totalElapsed: number
-  isCompleted: boolean
-  isPaused: boolean
-}
-
-export interface AthleteFilters {
-  category?: 'all' | 'men' | 'women'
-  year?: number
-  limit?: number
-  sortBy?: 'name' | 'totalTime' | 'ranking' | 'lastUpdated'
-  sortOrder?: 'asc' | 'desc'
-}
-
-export type DataFreshness = 'fresh' | 'stale' | 'unknown'
-
-export interface DataFreshnessInfo {
-  status: DataFreshness
-  message: string
-  color: string
-  lastUpdated?: string
-}
+export type AthleteCategory = 'men' | 'women'
+export type BackendStatus = 'loading' | 'online' | 'offline'
 
 export interface TimerState {
-  isRunning: boolean
-  isPaused: boolean
-  currentEventIndex: number
-  timeRemaining: number
-  totalElapsed: number
+  readonly isRunning: boolean
+  readonly isPaused: boolean
+  readonly currentEventIndex: number
+  readonly timeRemaining: number
+  readonly totalElapsed: number
+}
+
+export interface TimerDisplayProps {
+  athlete: Athlete
+  timerState: TimerState
+  currentEvent: {
+    readonly name: string
+    readonly duration: number
+    readonly color: string
+  } | null
 }

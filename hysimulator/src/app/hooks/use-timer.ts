@@ -2,9 +2,23 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { Athlete, TimerState } from '../types/athlete'
+import { UI_CONSTANTS } from '../constants'
 import useSound from 'use-sound'
 
-export function useTimer(selectedAthlete: Athlete | null) {
+interface UseTimerReturn {
+  timerState: TimerState
+  currentEvent: {
+    readonly name: string
+    readonly duration: number
+    readonly color: string
+  } | null
+  start: () => void
+  pause: () => void
+  stop: () => void
+  reset: () => void
+}
+
+export function useTimer(selectedAthlete: Athlete | null): UseTimerReturn {
   const [timerState, setTimerState] = useState<TimerState>({
     isRunning: false,
     isPaused: false,
@@ -14,9 +28,55 @@ export function useTimer(selectedAthlete: Athlete | null) {
   })
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
-  const [playBeep] = useSound('/beep.mp3', { volume: 0.5 })
+  const [playBeep] = useSound('/beep.mp3', { 
+    volume: UI_CONSTANTS.TIMER.BEEP_VOLUME 
+  })
 
   const currentEvent = selectedAthlete?.events[timerState.currentEventIndex] || null
+
+  const handleEventCompletion = useCallback((currentState: TimerState) => {
+    try {
+      playBeep()
+    } catch (error) {
+      console.warn('Audio playback failed:', error)
+    }
+
+    const nextEventIndex = currentState.currentEventIndex + 1
+    const newTotalElapsed = currentState.totalElapsed + 1
+
+    if (!selectedAthlete || nextEventIndex >= selectedAthlete.events.length) {
+      return {
+        ...currentState,
+        isRunning: false,
+        timeRemaining: 0,
+        totalElapsed: newTotalElapsed,
+      }
+    }
+
+    return {
+      ...currentState,
+      currentEventIndex: nextEventIndex,
+      timeRemaining: selectedAthlete.events[nextEventIndex].duration,
+      totalElapsed: newTotalElapsed,
+    }
+  }, [selectedAthlete, playBeep])
+
+  const updateTimer = useCallback(() => {
+    setTimerState(prev => {
+      const newTimeRemaining = prev.timeRemaining - 1
+      const newTotalElapsed = prev.totalElapsed + 1
+
+      if (newTimeRemaining <= 0) {
+        return handleEventCompletion(prev)
+      }
+
+      return {
+        ...prev,
+        timeRemaining: newTimeRemaining,
+        totalElapsed: newTotalElapsed,
+      }
+    })
+  }, [handleEventCompletion])
 
   const start = useCallback(() => {
     if (!selectedAthlete) return
@@ -62,50 +122,9 @@ export function useTimer(selectedAthlete: Athlete | null) {
     })
   }, [selectedAthlete])
 
-  // Timer effect
   useEffect(() => {
     if (timerState.isRunning && !timerState.isPaused && selectedAthlete) {
-      intervalRef.current = setInterval(() => {
-        setTimerState(prev => {
-          const newTimeRemaining = prev.timeRemaining - 1
-          const newTotalElapsed = prev.totalElapsed + 1
-
-          // Event completed
-          if (newTimeRemaining <= 0) {
-            try {
-              playBeep()
-            } catch (error) {
-              console.warn('Could not play sound:', error)
-            }
-
-            const nextEventIndex = prev.currentEventIndex + 1
-            
-            // All events completed
-            if (nextEventIndex >= selectedAthlete.events.length) {
-              return {
-                ...prev,
-                isRunning: false,
-                timeRemaining: 0,
-                totalElapsed: newTotalElapsed,
-              }
-            }
-
-            // Move to next event
-            return {
-              ...prev,
-              currentEventIndex: nextEventIndex,
-              timeRemaining: selectedAthlete.events[nextEventIndex].duration,
-              totalElapsed: newTotalElapsed,
-            }
-          }
-
-          return {
-            ...prev,
-            timeRemaining: newTimeRemaining,
-            totalElapsed: newTotalElapsed,
-          }
-        })
-      }, 1000)
+      intervalRef.current = setInterval(updateTimer, UI_CONSTANTS.TIMER.UPDATE_INTERVAL_MS)
 
       return () => {
         if (intervalRef.current) {
@@ -113,9 +132,8 @@ export function useTimer(selectedAthlete: Athlete | null) {
         }
       }
     }
-  }, [timerState.isRunning, timerState.isPaused, selectedAthlete, playBeep])
+  }, [timerState.isRunning, timerState.isPaused, selectedAthlete, updateTimer])
 
-  // Initialize timer when athlete changes
   useEffect(() => {
     if (selectedAthlete && !timerState.isRunning) {
       setTimerState(prev => ({
@@ -125,7 +143,7 @@ export function useTimer(selectedAthlete: Athlete | null) {
         totalElapsed: 0,
       }))
     }
-  }, [selectedAthlete])
+  }, [selectedAthlete, timerState.isRunning])
 
   return {
     timerState,

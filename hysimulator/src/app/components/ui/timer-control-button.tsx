@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { LucideIcon } from 'lucide-react'
 import { cn } from '../../lib/utils'
+import { UI_CONSTANTS } from '../../constants'
 
 export interface TimerControlButtonProps {
   icon: LucideIcon
@@ -14,24 +15,24 @@ export interface TimerControlButtonProps {
   className?: string
 }
 
-const variantStyles = {
+const VARIANT_STYLES = {
   primary: 'bg-[#feed00] text-black hover:bg-[#feed00]/90 shadow-lg hover:shadow-xl',
   secondary: 'bg-gray-600 text-white hover:bg-gray-500',
   danger: 'bg-red-600 text-white hover:bg-red-500',
   warning: 'bg-yellow-600 text-white hover:bg-yellow-500'
-}
+} as const
 
-const sizeStyles = {
+const SIZE_STYLES = {
   sm: 'px-4 py-2 text-sm',
   md: 'px-6 py-3 text-base',
   lg: 'px-8 py-4 text-lg'
-}
+} as const
 
-const iconSizes = {
+const ICON_SIZES = {
   sm: 16,
   md: 20,
   lg: 24
-}
+} as const
 
 export function TimerControlButton({
   icon: Icon,
@@ -51,15 +52,15 @@ export function TimerControlButton({
         'focus:outline-none focus:ring-2 focus:ring-[#feed00] focus:ring-offset-2',
         'disabled:opacity-50 disabled:cursor-not-allowed',
         'transform active:scale-95',
-        variantStyles[variant],
-        sizeStyles[size],
+        VARIANT_STYLES[variant],
+        SIZE_STYLES[size],
         className
       )}
-      whileHover={!disabled ? { scale: 1.02, y: -1 } : {}}
-      whileTap={!disabled ? { scale: 0.98 } : {}}
-      transition={{ type: "spring", stiffness: 400, damping: 17 }}
+      whileHover={!disabled ? { scale: UI_CONSTANTS.ANIMATION.HOVER_SCALE, y: -1 } : {}}
+      whileTap={!disabled ? { scale: UI_CONSTANTS.ANIMATION.ACTIVE_SCALE } : {}}
+      transition={UI_CONSTANTS.ANIMATION.SPRING_CONFIG}
     >
-      <Icon size={iconSizes[size]} />
+      <Icon size={ICON_SIZES[size]} />
       <span>{label}</span>
     </motion.button>
   )

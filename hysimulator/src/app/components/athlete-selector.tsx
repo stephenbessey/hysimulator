@@ -3,6 +3,8 @@
 import { motion } from 'framer-motion'
 import { Users } from 'lucide-react'
 import { Athlete } from '../types/athlete'
+import { SectionHeader } from './ui/section-header'
+import { formatTime } from '../lib/time-utils'
 
 interface AthleteSelectorProps {
   athletes: Athlete[]
@@ -27,18 +29,12 @@ export function AthleteSelector({
     }
   }
 
-  const formatTime = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${mins}:${String(secs).padStart(2, '0')}`
-  }
-
   return (
     <div className="space-y-4">
-      <div className="flex items-center mb-4">
-        <Users className="text-[#feed00] mr-3" size={24} />
-        <h3 className="text-xl font-bold text-black dark:text-white">SELECT YOUR ATHLETE</h3>
-      </div>
+      <SectionHeader 
+        icon={Users}
+        title="SELECT YOUR ATHLETE"
+      />
       
       <select
         value={selectedAthlete?.id || ''}
@@ -75,16 +71,14 @@ export function AthleteSelector({
                 {selectedAthlete.name.toUpperCase()}
               </h4>
               <p className="text-gray-600 dark:text-gray-400">
-                {selectedAthlete.category === 'men' ? 'Men\'s' : 'Women\'s'} Division
+                {selectedAthlete.category === 'men' ? 'Men\'s Division' : 'Women\'s Division'}
               </p>
             </div>
             <div className="text-right">
-              <div className="text-2xl font-black text-[#feed00]">
+              <p className="text-2xl font-bold text-[#feed00]">
                 {formatTime(selectedAthlete.totalTime)}
-              </div>
-              <div className="text-xs text-gray-600 dark:text-gray-400 font-semibold">
-                TOTAL TIME
-              </div>
+              </p>
+              <p className="text-sm text-gray-500">Total Time</p>
             </div>
           </div>
         </motion.div>
